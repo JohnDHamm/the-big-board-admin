@@ -8,16 +8,19 @@ import {
   PlayersPage,
   TeamsPage,
 } from './pages';
+import { ROUTES } from './routes';
+import { NavBar } from './components';
 
 function App() {
   return (
     <Router>
+      <NavBar />
       <Switch>
-        <Route path={'/leagues'} component={LeaguesPage} />
-        <Route path={'/owners'} component={OwnersPage} />
-        <Route path={'/teams'} component={TeamsPage} />
-        <Route path={'/players'} component={PlayersPage} />
-        <Route path={'/'} component={HomePage} />
+        <Route path={ROUTES.LEAGUES} component={LeaguesPage} />
+        <Route path={ROUTES.OWNERS} component={OwnersPage} />
+        <Route path={ROUTES.TEAMS} component={TeamsPage} />
+        <Route path={ROUTES.PLAYERS} component={PlayersPage} />
+        <Route path={ROUTES.HOME} component={HomePage} />
       </Switch>
     </Router>
   );
