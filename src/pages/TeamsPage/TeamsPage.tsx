@@ -1,7 +1,12 @@
 import React from 'react';
+import { PageLayout } from '../../layout';
 
 const TeamsPage: React.FC = () => {
-  return <div>teams page</div>;
+  return (
+    <PageLayout>
+      <div>teams page</div>
+    </PageLayout>
+  );
 };
 
 export default TeamsPage;

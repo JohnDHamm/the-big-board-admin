@@ -1,7 +1,12 @@
 import React from 'react';
+import { PageLayout } from '../../layout';
 
 const PlayersPage: React.FC = () => {
-  return <div>players page</div>;
+  return (
+    <PageLayout>
+      <div>players page</div>
+    </PageLayout>
+  );
 };
 
 export default PlayersPage;

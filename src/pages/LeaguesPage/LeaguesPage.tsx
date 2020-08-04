@@ -1,7 +1,12 @@
 import React from 'react';
+import { PageLayout } from '../../layout';
 
 const LeaguesPage: React.FC = () => {
-  return <div>leagues page</div>;
+  return (
+    <PageLayout>
+      <div>leagues page</div>
+    </PageLayout>
+  );
 };
 
 export default LeaguesPage;
