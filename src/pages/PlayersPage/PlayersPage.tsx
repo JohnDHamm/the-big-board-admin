@@ -41,7 +41,7 @@ const PlayersPage: React.FC = () => {
       })
       .then(() => getTeams())
       .then((teamsList: Team[]) => {
-        setTeams(sortBy(teamsList, ['city']));
+        setTeams(sortBy(teamsList, ['city', 'nickname']));
       })
       .catch((err) => console.log('err', err));
   };
