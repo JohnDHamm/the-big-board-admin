@@ -3,5 +3,7 @@ export const ROUTES = {
   LEAGUES: '/leagues',
   OWNERS: '/owners',
   TEAMS: '/teams',
+  PICKS: '/picks',
   PLAYERS: '/players',
+  RANKINGS: '/rankings',
 };

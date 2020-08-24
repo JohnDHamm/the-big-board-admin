@@ -5,7 +5,9 @@ import {
   HomePage,
   LeaguesPage,
   OwnersPage,
+  PicksPage,
   PlayersPage,
+  RankingsPage,
   TeamsPage,
 } from './pages';
 import { ROUTES } from './routes';
@@ -20,6 +22,8 @@ function App() {
         <Route path={ROUTES.OWNERS} component={OwnersPage} />
         <Route path={ROUTES.TEAMS} component={TeamsPage} />
         <Route path={ROUTES.PLAYERS} component={PlayersPage} />
+        <Route path={ROUTES.PICKS} component={PicksPage} />
+        <Route path={ROUTES.RANKINGS} component={RankingsPage} />
         <Route path={ROUTES.HOME} component={HomePage} />
       </Switch>
     </Router>

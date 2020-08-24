@@ -43,9 +43,9 @@ export const TabLink = styled(Link)`
 `;
 
 export const Tab = styled.div<{ active: boolean }>`
-  margin-left: 4rem;
+  margin-left: 3rem;
   margin-bottom: -0.5rem;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   color: ${(props) =>
     props.active ? COLORS.PRIMARY_GREEN : COLORS.DISABLED_GRAY};
   &:hover {
