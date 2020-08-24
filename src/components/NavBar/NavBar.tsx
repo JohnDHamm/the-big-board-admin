@@ -42,6 +42,12 @@ const NavBar: React.FC = () => {
           <TabLink to={ROUTES.PLAYERS}>
             <Tab active={path === ROUTES.PLAYERS}>Players</Tab>
           </TabLink>
+          <TabLink to={ROUTES.PICKS}>
+            <Tab active={path === ROUTES.PICKS}>Picks</Tab>
+          </TabLink>
+          <TabLink to={ROUTES.RANKINGS}>
+            <Tab active={path === ROUTES.RANKINGS}>Rankings</Tab>
+          </TabLink>
         </TabsContainer>
       </Container>
     </div>
