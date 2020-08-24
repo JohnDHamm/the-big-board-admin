@@ -1,11 +1,7 @@
 import React from 'react';
-import {
-  Content,
-  ContentItem,
-  PositionBlock,
-  RadioBlock,
-} from './PlayersPage.styles';
+import { Content, ContentItem } from './PlayersPage.styles';
 import { PageLayout } from '../../layout';
+import { PositionSelector } from '../../components';
 import {
   deletePlayer,
   getPlayers,
@@ -14,7 +10,7 @@ import {
   updatePlayer,
 } from '../../api';
 import { Autocomplete } from '@material-ui/lab';
-import { Button, Radio, Snackbar, TextField } from '@material-ui/core';
+import { Button, Snackbar, TextField } from '@material-ui/core';
 import sortBy from 'lodash.sortby';
 
 const PlayersPage: React.FC = () => {
@@ -90,8 +86,8 @@ const PlayersPage: React.FC = () => {
     setSelectedTeam(value);
   };
 
-  const handlePositionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPosition(event.target.value as NFL_Position);
+  const handlePositionChange = (position: NFL_Position) => {
+    setPosition(position);
   };
 
   const validateNames = (): boolean => {
@@ -171,24 +167,6 @@ const PlayersPage: React.FC = () => {
     }
   };
 
-  const renderPositions = () => {
-    const positions: NFL_Position[] = ['QB', 'RB', 'WR', 'TE', 'D', 'K'];
-    return positions.map((pos) => {
-      return (
-        <RadioBlock key={pos}>
-          <Radio
-            checked={position === pos}
-            onChange={handlePositionChange}
-            value={pos}
-            name="position-radio"
-            color="primary"
-          />
-          <p>{pos}</p>
-        </RadioBlock>
-      );
-    });
-  };
-
   const handleSnackClose = (event: React.SyntheticEvent, reason: any) => {
     if (reason === 'clickaway') {
       return;
@@ -248,7 +226,10 @@ const PlayersPage: React.FC = () => {
               style={{ width: 400 }}
             />
           </ContentItem>
-          <PositionBlock>{renderPositions()}</PositionBlock>
+          <PositionSelector
+            initialPosition={position}
+            onPositionChange={(pos) => handlePositionChange(pos)}
+          />
           <ContentItem>
             <Autocomplete
               id="teams-select"
