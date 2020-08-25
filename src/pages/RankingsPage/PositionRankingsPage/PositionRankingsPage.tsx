@@ -1,5 +1,4 @@
 import React from 'react';
-import { PageLayout } from '../../../layout';
 import {
   getPlayers,
   getPositionRankings,
@@ -32,7 +31,6 @@ declare global {
     rank: number;
     playerId: string;
   }
-  // type Ranking = Omit<SavedRanking, '_id'>;
 }
 
 interface SelectedRankingInfo {
@@ -82,7 +80,7 @@ const reducer = (
   }
 };
 
-const RankingsPage: React.FC = () => {
+const PositionRankingsPage: React.FC = () => {
   const [players, setPlayers] = React.useState<SavedPlayer[]>([]);
   const [playersForSelect, setPlayersForSelect] = React.useState<
     DisplayPlayer[]
@@ -108,7 +106,6 @@ const RankingsPage: React.FC = () => {
 
   const deleteRank = (rankNum: number) => {
     const ranking = rankingsList[selectedPosition][rankNum];
-    // console.log('ranking', ranking);
     const { _id, position, rank, scoringType } = ranking;
     const emptyRankList: SelectedRanking = {
       _id,
@@ -134,7 +131,6 @@ const RankingsPage: React.FC = () => {
   };
 
   const handlePlayerSelect = (player: DisplayPlayer) => {
-    // const {_id, firstName, lastName, teamId, position } = player
     if (rankingsList) {
       const rankId = rankingsList[selectedPosition][rankNumber]._id;
       const newRanking: SelectedRanking = {
@@ -206,7 +202,6 @@ const RankingsPage: React.FC = () => {
   }, [selectedPosition, players, setPlayersForSelect, teams]);
 
   React.useEffect(() => {
-    // console.log('scoringType', scoringType);
     if (!isEmpty(players) && !isEmpty(teams)) {
       getPositionRankings(scoringType)
         .then((rankings: SavedRanking[]) => {
@@ -302,7 +297,7 @@ const RankingsPage: React.FC = () => {
       <RankPlayerSelectModal
         onSelect={(player) => handlePlayerSelect(player)}
         onCancel={() => setShowModal(false)}
-        rankInfo={{ position: selectedPosition, rankNumber, scoringType }}
+        title={`${selectedPosition} #${rankNumber} (${scoringType})`}
         visible={showModal}
         playersForSelect={playersForSelect}
       />
@@ -310,4 +305,4 @@ const RankingsPage: React.FC = () => {
   );
 };
 
-export default RankingsPage;
+export default PositionRankingsPage;

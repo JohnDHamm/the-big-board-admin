@@ -7,24 +7,17 @@ interface Props {
   onCancel: () => void;
   onSelect: (player: DisplayPlayer) => void;
   playersForSelect: DisplayPlayer[];
-  rankInfo: {
-    rankNumber: number;
-    position: NFL_Position;
-    scoringType: ScoringType;
-  };
+  title: string;
   visible: boolean;
 }
 const RankPlayerSelectModal: React.FC<Props> = ({
   onCancel,
   onSelect,
   playersForSelect,
-  rankInfo,
+  title,
   visible,
 }) => {
-  const [
-    selectedPlayer,
-    setSelectedPlayer,
-  ] = React.useState<DisplayPlayer | null>(null);
+  const [selectedPlayer] = React.useState<DisplayPlayer | null>(null);
 
   const handlePlayerChange = (
     event: React.ChangeEvent<{}>,
@@ -42,9 +35,7 @@ const RankPlayerSelectModal: React.FC<Props> = ({
 
   return visible ? (
     <Container>
-      <Title>
-        {rankInfo.scoringType} {rankInfo.position} #{rankInfo.rankNumber}
-      </Title>
+      <Title>{title}</Title>
       <Autocomplete
         id="players-select"
         options={playersForSelect}
