@@ -6,6 +6,7 @@ import {
   RadioBlock,
 } from './RankingsPage.styles';
 import PositionRankingsPage from './PositionRankingsPage/PositionRankingsPage';
+import OverallRankingsPage from './OverallRankingsPage/OverallRankingsPage';
 import PageLayout from '../../layout/PageLayout/PageLayout';
 import { Radio } from '@material-ui/core';
 
@@ -47,7 +48,7 @@ const RankingsPage: React.FC = () => {
         {rankType === 'position' ? (
           <PositionRankingsPage />
         ) : (
-          <p>OverallRankingsPage</p>
+          <OverallRankingsPage />
         )}
       </Content>
     </PageLayout>

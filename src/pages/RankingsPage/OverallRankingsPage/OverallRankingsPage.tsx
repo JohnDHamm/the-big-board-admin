@@ -1,9 +1,9 @@
 import React from 'react';
 import {
+  getOverallRankings,
   getPlayers,
-  getPositionRankings,
   getTeams,
-  updatePositionRanking,
+  updateOverallRanking,
 } from '../../../api';
 import {
   Content,
@@ -16,17 +16,15 @@ import {
   SelectBlock,
   ScoringTypeBlock,
   TopContentItem,
-} from './PositionRankingsPage.styles';
-import { PositionSelector, RankPlayerSelectModal } from '../../../components';
-import { NFL_POSITIONS } from '../../../constants';
+} from './OverallRankingsPage.styles';
+import { RankPlayerSelectModal } from '../../../components';
 import { Radio } from '@material-ui/core';
 import isEmpty from 'lodash.isempty';
 import sortBy from 'lodash.sortby';
 
 declare global {
-  interface SavedRanking {
+  interface SavedOverallRanking {
     _id: string;
-    position: NFL_Position;
     scoringType: ScoringType;
     rank: number;
     playerId: string;
@@ -38,25 +36,14 @@ interface SelectedRankingInfo {
   teamAbbv: string;
 }
 
-type SelectedRanking = SavedRanking & SelectedRankingInfo;
+type SelectedRanking = SavedOverallRanking & SelectedRankingInfo;
 
-type RankingList = {
-  [key in NFL_Position]: {
-    [key: number]: SelectedRanking;
-  };
-};
-
-const initialRankings: RankingList = {
-  QB: {},
-  RB: {},
-  WR: {},
-  TE: {},
-  D: {},
-  K: {},
+type OverallRankingList = {
+  [key: number]: SelectedRanking;
 };
 
 const reducer = (
-  state: RankingList,
+  state: OverallRankingList,
   action: {
     type: string;
     payload: any;
@@ -66,31 +53,24 @@ const reducer = (
     case 'init':
       return action.payload;
     case 'update':
-      const position: NFL_Position = action.payload.position;
-      let newPosState = {
-        ...state[position],
-        ...{ [action.payload.data.rank]: action.payload.data },
-      };
-      updatePositionRanking(action.payload.data)
+      updateOverallRanking(action.payload)
         .then((res) => null)
         .catch((err) => console.log('err', err));
-      return { ...state, [position]: newPosState };
+      return { ...state, [action.payload.rank]: action.payload };
     default:
       return state;
   }
 };
 
-const PositionRankingsPage: React.FC = () => {
+const OverallRankingsPage: React.FC = () => {
   const [players, setPlayers] = React.useState<SavedPlayer[]>([]);
   const [playersForSelect, setPlayersForSelect] = React.useState<
     DisplayPlayer[]
   >([]);
   const [teams, setTeams] = React.useState<Team[]>([]);
   const [scoringType, setScoringType] = React.useState<ScoringType>('non-ppr');
-  const [selectedPosition, setSelectedPosition] = React.useState<NFL_Position>(
-    'QB'
-  );
-  const [rankingsList, dispatch] = React.useReducer(reducer, initialRankings);
+
+  const [rankingsList, dispatch] = React.useReducer(reducer, {});
   const [showModal, setShowModal] = React.useState<boolean>(false);
   const [rankNumber, setRankNumber] = React.useState<number>(0);
 
@@ -100,16 +80,11 @@ const PositionRankingsPage: React.FC = () => {
     setScoringType(event.target.value as ScoringType);
   };
 
-  const handlePositionChange = (position: NFL_Position) => {
-    setSelectedPosition(position);
-  };
-
   const deleteRank = (rankNum: number) => {
-    const ranking = rankingsList[selectedPosition][rankNum];
-    const { _id, position, rank, scoringType } = ranking;
+    const ranking = rankingsList[rankNum];
+    const { _id, rank, scoringType } = ranking;
     const emptyRankList: SelectedRanking = {
       _id,
-      position,
       rank,
       scoringType,
       playerId: '',
@@ -118,10 +93,7 @@ const PositionRankingsPage: React.FC = () => {
     };
     dispatch({
       type: 'update',
-      payload: {
-        position,
-        data: emptyRankList,
-      },
+      payload: emptyRankList,
     });
   };
 
@@ -132,11 +104,10 @@ const PositionRankingsPage: React.FC = () => {
 
   const handlePlayerSelect = (player: DisplayPlayer) => {
     if (rankingsList) {
-      const rankId = rankingsList[selectedPosition][rankNumber]._id;
+      const rankId = rankingsList[rankNumber]._id;
       const newRanking: SelectedRanking = {
         _id: rankId,
         playerId: player._id,
-        position: player.position,
         scoringType,
         rank: rankNumber,
         name: `${player.firstName} ${player.lastName}`,
@@ -144,7 +115,7 @@ const PositionRankingsPage: React.FC = () => {
       };
       dispatch({
         type: 'update',
-        payload: { position: player.position, data: newRanking },
+        payload: newRanking,
       });
       setShowModal(false);
     }
@@ -153,12 +124,10 @@ const PositionRankingsPage: React.FC = () => {
   const renderRankings = (): JSX.Element[] => {
     let list: JSX.Element[] = [];
     if (rankingsList && !isEmpty(players) && !isEmpty(teams)) {
-      const posRankTotal = Object.keys(rankingsList[selectedPosition]).length;
-      if (posRankTotal > 0) {
-        for (let i = 1; i < posRankTotal + 1; i++) {
-          const { name, teamAbbv, position, _id, playerId } = rankingsList[
-            selectedPosition
-          ][i];
+      const rankTotal = Object.keys(rankingsList).length;
+      if (rankTotal > 0) {
+        for (let i = 1; i < rankTotal + 1; i++) {
+          const { name, teamAbbv, position, _id, playerId } = rankingsList[i];
           list.push(
             <RankBlock key={_id}>
               <RankNum>{i}</RankNum>
@@ -187,54 +156,27 @@ const PositionRankingsPage: React.FC = () => {
   };
 
   React.useEffect(() => {
-    const positionPlayers = players.filter(
-      (player) => player.position === selectedPosition
-    );
-    const newArray: DisplayPlayer[] = [];
-    positionPlayers.forEach((player) => {
-      const team = teams.find((team) => team._id === player.teamId);
-      if (team) {
-        const newEntry: DisplayPlayer = { ...player, teamAbbv: team.abbv };
-        newArray.push(newEntry);
-      }
-    });
-    setPlayersForSelect(sortBy(newArray, ['lastName', 'firstName']));
-  }, [selectedPosition, players, setPlayersForSelect, teams]);
-
-  React.useEffect(() => {
     if (!isEmpty(players) && !isEmpty(teams)) {
-      getPositionRankings(scoringType)
+      getOverallRankings(scoringType)
         .then((rankings: SavedRanking[]) => {
-          const newList: RankingList = {
-            QB: {},
-            RB: {},
-            WR: {},
-            TE: {},
-            D: {},
-            K: {},
-          };
-          NFL_POSITIONS.forEach((pos) => {
-            const posRankings = rankings.filter(
-              (rank) => rank.position === pos
-            );
-            const sortedPosRankings = sortBy(posRankings, ['rank']);
-            sortedPosRankings.forEach((posRank) => {
-              let name = '',
-                teamAbbv = '';
-              if (posRankings.length > 0) {
-                const player = players.find(
-                  (player) => player._id === posRank.playerId
-                );
-                if (player) {
-                  name = `${player.firstName} ${player.lastName}`;
-                  const team = teams.find((team) => team._id === player.teamId);
-                  if (team) {
-                    teamAbbv = team.abbv;
-                  }
+          const newList: OverallRankingList = {};
+          const sortedRankings = sortBy(rankings, ['rank']);
+          sortedRankings.forEach((ranking) => {
+            let name = '',
+              teamAbbv = '';
+            if (rankings.length > 0) {
+              const player = players.find(
+                (player) => player._id === ranking.playerId
+              );
+              if (player) {
+                name = `${player.firstName} ${player.lastName}`;
+                const team = teams.find((team) => team._id === player.teamId);
+                if (team) {
+                  teamAbbv = team.abbv;
                 }
               }
-              newList[pos][posRank.rank] = { ...posRank, name, teamAbbv };
-            });
+            }
+            newList[ranking.rank] = { ...ranking, name, teamAbbv };
           });
           dispatch({
             type: 'init',
@@ -244,6 +186,18 @@ const PositionRankingsPage: React.FC = () => {
         .catch((err) => console.log('err', err));
     }
   }, [scoringType, players, teams]);
+
+  React.useEffect(() => {
+    const newArray: DisplayPlayer[] = [];
+    players.forEach((player) => {
+      const team = teams.find((team) => team._id === player.teamId);
+      if (team) {
+        const newEntry: DisplayPlayer = { ...player, teamAbbv: team.abbv };
+        newArray.push(newEntry);
+      }
+    });
+    setPlayersForSelect(sortBy(newArray, ['lastName', 'firstName']));
+  }, [players, setPlayersForSelect, teams]);
 
   React.useEffect(() => {
     getPlayers()
@@ -285,19 +239,13 @@ const PositionRankingsPage: React.FC = () => {
               </RadioBlock>
             </ScoringTypeBlock>
           </ContentItem>
-          <ContentItem>
-            <PositionSelector
-              initialPosition={selectedPosition}
-              onPositionChange={(pos) => handlePositionChange(pos)}
-            />
-          </ContentItem>
         </TopContentItem>
         <ContentItem>{renderRankings()}</ContentItem>
       </Content>
       <RankPlayerSelectModal
         onSelect={(player) => handlePlayerSelect(player)}
         onCancel={() => setShowModal(false)}
-        title={`${selectedPosition} #${rankNumber} (${scoringType})`}
+        title={`overall #${rankNumber} (${scoringType})`}
         visible={showModal}
         playersForSelect={playersForSelect}
       />
@@ -305,4 +253,4 @@ const PositionRankingsPage: React.FC = () => {
   );
 };
 
-export default PositionRankingsPage;
+export default OverallRankingsPage;
