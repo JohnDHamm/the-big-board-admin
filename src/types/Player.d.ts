@@ -18,3 +18,5 @@ interface Player {
 }
 
 type SavedPlayer = Player & Id;
+
+type DisplayPlayer = SavedPlayer & { teamAbbv: string };

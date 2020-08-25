@@ -1,9 +1,10 @@
 import React from 'react';
-import { Container, Title } from './RankPlayerSelectModal.styles';
+import { ButtonBlock, Container, Title } from './RankPlayerSelectModal.styles';
 import { Autocomplete } from '@material-ui/lab';
-import { TextField } from '@material-ui/core';
+import { Button, TextField } from '@material-ui/core';
 
 interface Props {
+  onCancel: () => void;
   onSelect: (player: DisplayPlayer) => void;
   playersForSelect: DisplayPlayer[];
   rankInfo: {
@@ -14,6 +15,7 @@ interface Props {
   visible: boolean;
 }
 const RankPlayerSelectModal: React.FC<Props> = ({
+  onCancel,
   onSelect,
   playersForSelect,
   rankInfo,
@@ -29,7 +31,7 @@ const RankPlayerSelectModal: React.FC<Props> = ({
     value: DisplayPlayer | null
   ) => {
     if (value) {
-      setSelectedPlayer(value);
+      // setSelectedPlayer(value);
       onSelect(value);
     }
   };
@@ -54,6 +56,11 @@ const RankPlayerSelectModal: React.FC<Props> = ({
           <TextField {...params} label="select player" variant="outlined" />
         )}
       />
+      <ButtonBlock>
+        <Button onClick={onCancel} variant="contained" color="primary">
+          cancel
+        </Button>
+      </ButtonBlock>
     </Container>
   ) : null;
 };
