@@ -10,6 +10,7 @@ export const Default = () => (
   <RankPlayerSelectModal
     visible={true}
     rankInfo={{ position: 'WR', rankNumber: 42, scoringType: 'non-ppr' }}
+    onCancel={() => console.log('cancelled')}
     onSelect={(player) => console.log('player', player)}
     playersForSelect={[
       {
