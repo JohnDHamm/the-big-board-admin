@@ -31,13 +31,6 @@ declare global {
   }
 }
 
-interface Owner {
-  _id: string;
-  name: string;
-  leagueId: string;
-  isCommish: boolean;
-}
-
 type PickCardInfo = {
   ownerName: string;
   playerName: string;
