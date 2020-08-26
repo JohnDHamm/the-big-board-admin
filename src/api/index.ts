@@ -1,5 +1,6 @@
 import { deletePick } from './deletePick/deletePick';
 import { deletePlayer } from './deletePlayer/deletePlayer';
+import { getLeague } from './getLeague/getLeague';
 import { getLeaguesList } from './getLeaguesList/getLeaguesList';
 import { getOverallRankings } from './getOverallRankings/getOverallRankings';
 import { getOwners } from './getOwners/getOwners';
@@ -17,6 +18,7 @@ export const DEV_API_ROOT_URL = 'http://localhost:4001';
 export {
   deletePick,
   deletePlayer,
+  getLeague,
   getLeaguesList,
   getOverallRankings,
   getOwners,
