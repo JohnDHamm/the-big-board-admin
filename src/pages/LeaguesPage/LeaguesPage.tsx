@@ -3,20 +3,37 @@ import { PageLayout } from '../../layout';
 import {
   Content,
   ContentItem,
+  DeleteBtn,
+  DraftOrderBlock,
+  DraftOrderNum,
+  OwnerName,
   RadioBlock,
   RowContent,
+  SelectBlock,
   ScoringTypeBlock,
 } from './LeaguesPage.styles';
-import { getLeague, getLeaguesList, getOwners } from '../../api';
+import { OwnerSelectModal } from '../../components';
+import {
+  createLeague,
+  getLeague,
+  getLeaguesList,
+  getOwners,
+  updateLeague,
+} from '../../api';
 import { NFL_POSITIONS } from '../../constants';
 import { Autocomplete } from '@material-ui/lab';
 import { Button, Radio, TextField } from '@material-ui/core';
+import sortBy from 'lodash.sortby';
 
-type PositionSlots = {
+type PositionSlotsList = {
   [key in NFL_Position]: number;
 };
 
-const INITIAL_POSITION_SLOTS: PositionSlots = {
+type DraftOrderList = {
+  [key: number]: string;
+};
+
+const INITIAL_POSITION_SLOTS: PositionSlotsList = {
   QB: 2,
   RB: 4,
   WR: 4,
@@ -26,7 +43,7 @@ const INITIAL_POSITION_SLOTS: PositionSlots = {
 };
 
 const slotsReducer = (
-  state: PositionSlots,
+  state: PositionSlotsList,
   action: {
     type: string;
     payload: any;
@@ -42,13 +59,48 @@ const slotsReducer = (
   }
 };
 
+const draftOrderReducer = (
+  state: DraftOrderList,
+  action: {
+    type: string;
+    payload: any;
+  }
+) => {
+  switch (action.type) {
+    case 'init':
+      return action.payload;
+    case 'clear':
+      return {};
+    case 'update':
+      return {
+        ...state,
+        [action.payload.orderNumber]: action.payload.ownerId,
+      };
+    case 'delete':
+      const newState: DraftOrderList = {};
+      Object.keys(state)
+        .filter((num) => num !== action.payload.toString())
+        .forEach((key) => {
+          const orderNum = parseInt(key);
+          newState[orderNum] = state[orderNum];
+        });
+      return newState;
+    default:
+      return state;
+  }
+};
+
 const LeaguesPage: React.FC = () => {
   const [leagues, setLeagues] = React.useState<LeagueListItem[]>([]);
   const [selectedLeague, setSelectedLeague] = React.useState<League | null>(
     null
   );
   const [scoringType, setScoringType] = React.useState<ScoringType>('non-ppr');
-  const [draftOrder, setDraftOrder] = React.useState<string[]>([]);
+  const [draftOrder, draftOrderDispatch] = React.useReducer(
+    draftOrderReducer,
+    {}
+  );
+  // const [ownerSelectionList, setOwnerSelectionList] = React.useState<Owner[]>([]);
   const [draftStatus, setDraftStatus] = React.useState<DraftStatus>(
     'not started'
   );
@@ -59,7 +111,10 @@ const LeaguesPage: React.FC = () => {
 
   const [owners, setOwners] = React.useState<Owner[]>([]);
   const [showForm, setShowForm] = React.useState<boolean>(false);
+  const [isEditing, setIsEditing] = React.useState<boolean>(false);
   const [name, setName] = React.useState<string>('');
+  const [showModal, setShowModal] = React.useState<boolean>(false);
+  const [orderNumber, setOrderNumber] = React.useState<number>(0);
 
   const handleSelectChange = (
     event: React.ChangeEvent<{}>,
@@ -68,7 +123,7 @@ const LeaguesPage: React.FC = () => {
     if (value) {
       getLeague(value._id)
         .then((league: League) => {
-          console.log('league', league);
+          // console.log('league', league);
           const {
             scoringType,
             draftOrder,
@@ -79,7 +134,7 @@ const LeaguesPage: React.FC = () => {
           setSelectedLeague(league);
           setName(name);
           setScoringType(scoringType);
-          const savedPosSlots: PositionSlots = INITIAL_POSITION_SLOTS;
+          const savedPosSlots: PositionSlotsList = INITIAL_POSITION_SLOTS;
           positionSlots.forEach((pos) => {
             savedPosSlots[pos.position] = pos.total;
           });
@@ -87,9 +142,17 @@ const LeaguesPage: React.FC = () => {
             type: 'init',
             payload: savedPosSlots,
           });
-          setDraftOrder(draftOrder);
+          const newDraftOrder: DraftOrderList = {};
+          draftOrder.forEach((ownerId, idx) => {
+            newDraftOrder[idx + 1] = ownerId;
+          });
+          draftOrderDispatch({
+            type: 'init',
+            payload: newDraftOrder,
+          });
           setDraftStatus(draftStatus);
           setShowForm(true);
+          setIsEditing(true);
         })
         .catch((err) => console.log('err', err));
     }
@@ -114,7 +177,10 @@ const LeaguesPage: React.FC = () => {
       type: 'init',
       payload: INITIAL_POSITION_SLOTS,
     });
-    setDraftOrder([]);
+    draftOrderDispatch({
+      type: 'clear',
+      payload: {},
+    });
     setDraftStatus('not started');
     setSelectedLeague(null);
   };
@@ -122,9 +188,125 @@ const LeaguesPage: React.FC = () => {
   const initNewLeague = () => {
     clearForm();
     setShowForm(true);
+    setIsEditing(false);
   };
 
-  const renderPosSlots = () => {
+  const getOwnerName = (ownerId: string): string => {
+    const owner = owners.find((owner) => owner._id === ownerId);
+    return owner ? owner.name : '';
+  };
+
+  const handleSelect = (orderNum: number) => {
+    setOrderNumber(orderNum);
+    setShowModal(true);
+  };
+
+  const handleOwnerSelect = (owner: Owner) => {
+    draftOrderDispatch({
+      type: 'update',
+      payload: {
+        orderNumber,
+        ownerId: owner._id,
+      },
+    });
+    setShowModal(false);
+  };
+
+  const deleteOwner = (orderNumber: number) => {
+    draftOrderDispatch({
+      type: 'delete',
+      payload: orderNumber,
+    });
+  };
+
+  const getLeagueData = () => {
+    const newPositionSlots: Position_Slot[] = [];
+    Object.keys(positionSlots as PositionSlotsList).forEach((key) => {
+      newPositionSlots.push({
+        position: key as NFL_Position,
+        total: positionSlots[key],
+      });
+    });
+    const newDraftOrder: string[] = [];
+    for (let i = 1; i < Object.keys(draftOrder).length + 1; i++) {
+      newDraftOrder.push(draftOrder[i]);
+    }
+    return { newPositionSlots, newDraftOrder };
+  };
+
+  const saveChanges = () => {
+    const { newPositionSlots, newDraftOrder } = getLeagueData();
+    if (selectedLeague) {
+      const leagueChanges: League = {
+        _id: selectedLeague._id,
+        name,
+        scoringType,
+        draftStatus,
+        positionSlots: newPositionSlots,
+        draftOrder: newDraftOrder,
+      };
+      updateLeague(leagueChanges)
+        .then((res) => {
+          console.log('res', res);
+          clearForm();
+          setShowForm(false);
+          setIsEditing(false);
+        })
+        .catch((err) => console.log('err', err));
+    } else {
+      //TODO: show error for missing info
+      console.warn('missing form fields');
+    }
+  };
+
+  const saveLeague = () => {
+    if (name.length > 0) {
+      const { newPositionSlots, newDraftOrder } = getLeagueData();
+      const newLeague: Omit<League, '_id'> = {
+        name,
+        scoringType,
+        draftStatus,
+        positionSlots: newPositionSlots,
+        draftOrder: newDraftOrder,
+      };
+      createLeague(newLeague)
+        .then((res) => {
+          console.log('res', res);
+          clearForm();
+          setShowForm(false);
+        })
+        .catch((err) => console.log('err', err));
+    } else {
+      //TODO: show error for missing info
+      console.warn('missing form fields');
+    }
+  };
+
+  const renderDraftOrder = (): JSX.Element[] => {
+    const list = [];
+    for (let i = 1; i < owners.length + 1; i++) {
+      list.push(
+        <RowContent key={i}>
+          <DraftOrderBlock>
+            <DraftOrderNum>{i}</DraftOrderNum>
+            {draftOrder[i] ? (
+              <OwnerName>
+                {getOwnerName(draftOrder[i])}
+                <DeleteBtn onClick={() => deleteOwner(i)}>X</DeleteBtn>
+              </OwnerName>
+            ) : (
+              <SelectBlock onClick={() => handleSelect(i)}>
+                select owner
+              </SelectBlock>
+            )}
+          </DraftOrderBlock>
+        </RowContent>
+      );
+    }
+    return list;
+  };
+
+  const renderPosSlots = (): JSX.Element[] => {
     return NFL_POSITIONS.map((pos) => {
       return (
         <TextField
@@ -151,8 +333,8 @@ const LeaguesPage: React.FC = () => {
   React.useEffect(() => {
     if (selectedLeague) {
       getOwners(selectedLeague._id)
-        .then((owners) => {
-          setOwners(owners);
+        .then((owners: Owner[]) => {
+          setOwners(sortBy(owners, ['name']));
         })
         .catch((err) => console.log('err', err));
     }
@@ -165,6 +347,11 @@ const LeaguesPage: React.FC = () => {
       })
       .catch((err) => console.log('err', err));
   }, []);
+
+  React.useEffect(() => {
+    // console.log('draftOrder', draftOrder);
+    //TODO: update owners for select (don't include ones already with a spot)
+  }, [draftOrder]);
 
   return (
     <PageLayout>
@@ -230,6 +417,7 @@ const LeaguesPage: React.FC = () => {
               <RowContent>{renderPosSlots()}</RowContent>
             </ContentItem>
           </RowContent>
+          <ContentItem>{renderDraftOrder()}</ContentItem>
           <RowContent>
             <RadioBlock key="not started">
               <Radio
@@ -272,8 +460,28 @@ const LeaguesPage: React.FC = () => {
               <p>done</p>
             </RadioBlock>
           </RowContent>
+          {isEditing ? (
+            <ContentItem>
+              <Button onClick={saveChanges} variant="contained" color="primary">
+                save changes
+              </Button>
+            </ContentItem>
+          ) : (
+            <ContentItem>
+              <Button onClick={saveLeague} variant="contained" color="primary">
+                save new league
+              </Button>
+            </ContentItem>
+          )}
         </Content>
       )}
+      <OwnerSelectModal
+        onSelect={(owner) => handleOwnerSelect(owner)}
+        onCancel={() => setShowModal(false)}
+        title={`draft order #${orderNumber}`}
+        visible={showModal}
+        ownersForSelect={owners}
+      />
     </PageLayout>
   );
 };
