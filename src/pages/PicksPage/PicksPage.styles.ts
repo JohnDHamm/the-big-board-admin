@@ -1,17 +1,5 @@
 import styled from 'styled-components';
 
-export const Content = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-`;
-
-export const ContentItem = styled.div`
-  margin: 1rem 0;
-`;
-
 export const PickBlock = styled.div`
   margin: 0.5rem 0;
   display: flex;
@@ -40,10 +28,4 @@ export const PickPlayer = styled.div`
 export const OwnerName = styled.span`
   margin: 0;
   color: #bada55;
-`;
-
-export const DeleteBtn = styled.div`
-  &:hover {
-    cursor: pointer;
-  }
 `;

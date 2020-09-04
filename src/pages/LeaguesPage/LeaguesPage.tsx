@@ -1,15 +1,17 @@
 import React from 'react';
-import { PageLayout } from '../../layout';
 import {
   Content,
   ContentItem,
   DeleteBtn,
-  DraftOrderBlock,
-  DraftOrderNum,
-  OwnerName,
+  PageLayout,
   RadioBlock,
   RowContent,
   SelectBlock,
+} from '../../layout';
+import {
+  DraftOrderBlock,
+  DraftOrderNum,
+  OwnerName,
   ScoringTypeBlock,
 } from './LeaguesPage.styles';
 import { OwnerSelectModal } from '../../components';

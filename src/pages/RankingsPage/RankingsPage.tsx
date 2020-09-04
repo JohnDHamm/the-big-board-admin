@@ -1,13 +1,8 @@
 import React from 'react';
-import {
-  Content,
-  ContentItem,
-  ScoringTypeBlock,
-  RadioBlock,
-} from './RankingsPage.styles';
+import { ScoringTypeBlock } from './RankingsPage.styles';
 import PositionRankingsPage from './PositionRankingsPage/PositionRankingsPage';
 import OverallRankingsPage from './OverallRankingsPage/OverallRankingsPage';
-import PageLayout from '../../layout/PageLayout/PageLayout';
+import { Content, ContentItem, PageLayout, RadioBlock } from '../../layout';
 import { Radio } from '@material-ui/core';
 
 type RankingType = 'position' | 'overall';
