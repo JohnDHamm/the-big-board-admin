@@ -72,6 +72,7 @@ const PlayersPage: React.FC = () => {
     setPosition('QB');
     setSelectedTeam(null);
     setSelectedPlayer(null);
+    setIsEditing(false);
   };
 
   const initNewPlayer = () => {
