@@ -1,5 +1,6 @@
 import { createLeague } from './createLeague/createLeague';
 import { createOwner } from './createOwner/createOwner';
+import { deleteAllPicks } from './deleteAllPicks/deleteAllPicks';
 import { deleteOwner } from './deleteOwner/deleteOwner';
 import { deletePick } from './deletePick/deletePick';
 import { deletePlayer } from './deletePlayer/deletePlayer';
@@ -24,6 +25,7 @@ export const DEV_API_ROOT_URL = 'http://localhost:4001';
 export {
   createLeague,
   createOwner,
+  deleteAllPicks,
   deleteOwner,
   deletePick,
   deletePlayer,
