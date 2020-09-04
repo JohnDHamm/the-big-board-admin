@@ -2,6 +2,7 @@ import React from 'react';
 import { OwnerName, PickBlock, PickNum, PickPlayer } from './PicksPage.styles';
 import { Content, ContentItem, DeleteBtn, PageLayout } from '../../layout';
 import {
+  deleteAllPicks,
   deletePick,
   getLeaguesList,
   getOwners,
@@ -10,7 +11,7 @@ import {
   getTeams,
 } from '../../api';
 import { Autocomplete } from '@material-ui/lab';
-import { TextField } from '@material-ui/core';
+import { Button, TextField } from '@material-ui/core';
 import isEmpty from 'lodash.isempty';
 import sortBy from 'lodash.sortby';
 
@@ -59,6 +60,8 @@ const reducer = (
         });
 
       return newState;
+    case 'clear':
+      return {};
     // case 'update':
     //   updateOverallRanking(action.payload)
     //     .then((res) => null)
@@ -132,6 +135,21 @@ const PicksPage: React.FC = () => {
       }
     }
     return list;
+  };
+
+  const submitDelete = () => {
+    if (selectedLeague) {
+      deleteAllPicks(selectedLeague?._id)
+        .then((res) => {
+          setSelectedLeague(null);
+          console.log('res', res);
+          dispatch({
+            type: 'clear',
+            payload: {},
+          });
+        })
+        .catch((err) => console.log('err', err));
+    }
   };
 
   React.useEffect(() => {
@@ -227,7 +245,20 @@ const PicksPage: React.FC = () => {
             )}
           />
         </ContentItem>
-        <ContentItem>{renderPicks()}</ContentItem>
+        <ContentItem>
+          {renderPicks()}
+          {selectedLeague && !isEmpty(picks) ? (
+            <ContentItem>
+              <Button
+                onClick={submitDelete}
+                variant="contained"
+                color="secondary"
+              >
+                delete all picks
+              </Button>
+            </ContentItem>
+          ) : null}
+        </ContentItem>
       </Content>
     </PageLayout>
   );
