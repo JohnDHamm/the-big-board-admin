@@ -1,6 +1,5 @@
 import React from 'react';
-import { Content, ContentItem } from './OwnersPage.styles';
-import { PageLayout } from '../../layout';
+import { Content, ContentItem, PageLayout } from '../../layout';
 import {
   createOwner,
   deleteOwner,

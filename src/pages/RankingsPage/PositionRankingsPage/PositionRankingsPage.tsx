@@ -6,17 +6,19 @@ import {
   updatePositionRanking,
 } from '../../../api';
 import {
+  RankBlock,
+  RankNum,
+  RankPlayer,
+  TopContentItem,
+} from '../RankingsPage.styles';
+import { ScoringTypeBlock } from './PositionRankingsPage.styles';
+import {
   Content,
   ContentItem,
   DeleteBtn,
   RadioBlock,
-  RankBlock,
-  RankNum,
-  RankPlayer,
   SelectBlock,
-  ScoringTypeBlock,
-  TopContentItem,
-} from './PositionRankingsPage.styles';
+} from '../../../layout';
 import { PositionSelector, RankPlayerSelectModal } from '../../../components';
 import { NFL_POSITIONS } from '../../../constants';
 import { Radio } from '@material-ui/core';

@@ -10,13 +10,15 @@ import {
   ContentItem,
   DeleteBtn,
   RadioBlock,
+  SelectBlock,
+} from '../../../layout';
+import {
   RankBlock,
   RankNum,
   RankPlayer,
-  SelectBlock,
-  ScoringTypeBlock,
   TopContentItem,
-} from './OverallRankingsPage.styles';
+} from '../RankingsPage.styles';
+import { ScoringTypeBlock } from './OverallRankingsPage.styles';
 import { RankPlayerSelectModal } from '../../../components';
 import { Radio } from '@material-ui/core';
 import isEmpty from 'lodash.isempty';

@@ -1,14 +1,6 @@
 import React from 'react';
-import {
-  Content,
-  ContentItem,
-  DeleteBtn,
-  OwnerName,
-  PickBlock,
-  PickNum,
-  PickPlayer,
-} from './PicksPage.styles';
-import { PageLayout } from '../../layout';
+import { OwnerName, PickBlock, PickNum, PickPlayer } from './PicksPage.styles';
+import { Content, ContentItem, DeleteBtn, PageLayout } from '../../layout';
 import {
   deletePick,
   getLeaguesList,

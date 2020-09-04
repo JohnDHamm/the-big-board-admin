@@ -1,6 +1,5 @@
 import React from 'react';
-import { Content, ContentItem } from './PlayersPage.styles';
-import { PageLayout } from '../../layout';
+import { Content, ContentItem, PageLayout } from '../../layout';
 import { PositionSelector } from '../../components';
 import {
   deletePlayer,
