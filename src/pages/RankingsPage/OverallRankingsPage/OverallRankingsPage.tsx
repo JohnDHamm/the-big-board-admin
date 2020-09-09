@@ -35,6 +35,7 @@ declare global {
 
 interface SelectedRankingInfo {
   name: string;
+  position: string;
   teamAbbv: string;
 }
 
@@ -91,6 +92,7 @@ const OverallRankingsPage: React.FC = () => {
       scoringType,
       playerId: '',
       name: '',
+      position: '',
       teamAbbv: '',
     };
     dispatch({
@@ -113,6 +115,7 @@ const OverallRankingsPage: React.FC = () => {
         scoringType,
         rank: rankNumber,
         name: `${player.firstName} ${player.lastName}`,
+        position: player.position,
         teamAbbv: player.teamAbbv,
       };
       dispatch({
@@ -165,6 +168,7 @@ const OverallRankingsPage: React.FC = () => {
           const sortedRankings = sortBy(rankings, ['rank']);
           sortedRankings.forEach((ranking) => {
             let name = '',
+              position = '',
               teamAbbv = '';
             if (rankings.length > 0) {
               const player = players.find(
@@ -172,13 +176,14 @@ const OverallRankingsPage: React.FC = () => {
               );
               if (player) {
                 name = `${player.firstName} ${player.lastName}`;
+                position = player.position;
                 const team = teams.find((team) => team._id === player.teamId);
                 if (team) {
                   teamAbbv = team.abbv;
                 }
               }
             }
-            newList[ranking.rank] = { ...ranking, name, teamAbbv };
+            newList[ranking.rank] = { ...ranking, name, position, teamAbbv };
           });
           dispatch({
             type: 'init',
