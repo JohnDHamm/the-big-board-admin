@@ -20,7 +20,8 @@ import { updateOwner } from './updateOwner/updateOwner';
 import { updatePlayer } from './updatePlayer/updatePlayer';
 import { updatePositionRanking } from './updatePositionRanking/updatePositionRanking';
 
-export const DEV_API_ROOT_URL = 'http://localhost:4001';
+export const DEV_API_ROOT_URL =
+  `${process.env.REACT_APP_API_URL}` || 'http://localhost:4001';
 
 export {
   createLeague,
