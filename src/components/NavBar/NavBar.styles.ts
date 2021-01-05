@@ -18,24 +18,14 @@ export const Container = styled.div`
   overflow: hidden;
 `;
 
-export const LogoContainer = styled.div``;
-
-export const LogoLink = styled(Link)`
-  text-decoration: none;
-`;
-
-export const TextLogo = styled.p<{ active: boolean }>`
-  margin: 0;
-  margin-bottom: -0.5rem;
-  font-size: 2.25rem;
-  color: ${(props) =>
-    props.active ? COLORS.PRIMARY_GREEN : COLORS.DISABLED_GRAY};
-  font-weight: 900;
+export const LogoContainer = styled.div`
+  width: 240px;
 `;
 
 export const TabsContainer = styled.div`
   display: flex;
   margin-right: 2rem;
+  padding-bottom: 0.5rem;
 `;
 
 export const TabLink = styled(Link)`
