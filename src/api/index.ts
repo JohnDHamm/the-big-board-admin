@@ -1,3 +1,4 @@
+import { adminLogin } from './adminLogin/adminLogin';
 import { createLeague } from './createLeague/createLeague';
 import { createOwner } from './createOwner/createOwner';
 import { deleteAllPicks } from './deleteAllPicks/deleteAllPicks';
@@ -24,6 +25,7 @@ export const DEV_API_ROOT_URL =
   `${process.env.REACT_APP_API_URL}` || 'http://localhost:4001';
 
 export {
+  adminLogin,
   createLeague,
   createOwner,
   deleteAllPicks,
