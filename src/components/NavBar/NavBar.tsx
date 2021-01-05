@@ -2,12 +2,11 @@ import React from 'react';
 import {
   Container,
   LogoContainer,
-  LogoLink,
   Tab,
   TabsContainer,
   TabLink,
-  TextLogo,
 } from './NavBar.styles';
+import Logo from '../Logo/Logo';
 import { useLocation } from 'react-router-dom';
 import { ROUTES } from '../../routes';
 
@@ -25,9 +24,7 @@ const NavBar: React.FC = () => {
     <div>
       <Container>
         <LogoContainer>
-          <LogoLink to={ROUTES.HOME}>
-            <TextLogo active={path === ROUTES.HOME}>Big Board Admin</TextLogo>
-          </LogoLink>
+          <Logo />
         </LogoContainer>
         <TabsContainer>
           <TabLink to={ROUTES.LEAGUES}>
