@@ -1,5 +1,10 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Redirect,
+  Route,
+  Switch,
+} from 'react-router-dom';
 import './App.css';
 import {
   HomePage,
@@ -12,10 +17,14 @@ import {
 } from './pages';
 import { ROUTES } from './routes';
 import { NavBar } from './components';
+import { UserContext } from './contexts/UserContext';
+import { useUser } from './hooks/useUser/useUser';
 
-function App() {
-  return (
-    <Router>
+const ProtectedRoutes: React.FC = () => {
+  const { user } = React.useContext(UserContext);
+
+  return user ? (
+    <div>
       <NavBar />
       <Switch>
         <Route path={ROUTES.LEAGUES} component={LeaguesPage} />
@@ -24,9 +33,26 @@ function App() {
         <Route path={ROUTES.PLAYERS} component={PlayersPage} />
         <Route path={ROUTES.PICKS} component={PicksPage} />
         <Route path={ROUTES.RANKINGS} component={RankingsPage} />
-        <Route path={ROUTES.HOME} component={HomePage} />
       </Switch>
-    </Router>
+    </div>
+  ) : (
+    <Redirect to={ROUTES.HOME} />
+  );
+};
+
+function App() {
+  const user = useUser();
+
+  return (
+    <UserContext.Provider value={user}>
+      <Router>
+        <Switch>
+          <Route path={ROUTES.ADMIN} component={ProtectedRoutes} />
+          <Route path={ROUTES.HOME} component={HomePage} />
+        </Switch>
+        <Redirect to={ROUTES.HOME} />
+      </Router>
+    </UserContext.Provider>
   );
 }
 
