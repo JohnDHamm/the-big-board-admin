@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { DEV_API_ROOT_URL } from '../index';
+import { createAuthenticationHeaders } from '../helpers';
 
 export const updateLeague = async (league: League) => {
   const { name, scoringType, positionSlots, draftOrder, draftStatus } = league;
@@ -12,7 +13,8 @@ export const updateLeague = async (league: League) => {
         positionSlots,
         draftOrder,
         draftStatus,
-      }
+      },
+      createAuthenticationHeaders()
     );
     return data;
   } catch (err) {

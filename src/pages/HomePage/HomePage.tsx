@@ -6,6 +6,7 @@ import { adminLogin } from '../../api';
 import { UserContext } from '../../contexts/UserContext';
 import { useHistory } from 'react-router-dom';
 import { ROUTES } from '../../routes';
+import { LOCAL_STORAGE } from '../../constants';
 
 const HomePage: React.FC = () => {
   const history = useHistory();
@@ -21,6 +22,7 @@ const HomePage: React.FC = () => {
         .then((res) => {
           if (res) {
             setCurrentUser(res);
+            localStorage.setItem(LOCAL_STORAGE.JWT_TOKEN, res.accessToken);
             history.push(ROUTES.LEAGUES);
           }
         })
