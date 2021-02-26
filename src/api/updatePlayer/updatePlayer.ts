@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { DEV_API_ROOT_URL } from '../index';
+import { createAuthenticationHeaders } from '../helpers';
 
 export const updatePlayer = async (player: SavedPlayer) => {
   const { firstName, lastName, position, teamId } = player;
@@ -11,7 +12,8 @@ export const updatePlayer = async (player: SavedPlayer) => {
         lastName,
         position,
         teamId,
-      }
+      },
+      createAuthenticationHeaders()
     );
     return data;
   } catch (err) {
