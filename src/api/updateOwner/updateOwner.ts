@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { DEV_API_ROOT_URL } from '../index';
+import { createAuthenticationHeaders } from '../helpers';
 
 export const updateOwner = async (owner: Owner & Password) => {
   const { name, isCommish, password } = owner;
@@ -10,7 +11,8 @@ export const updateOwner = async (owner: Owner & Password) => {
         name,
         isCommish,
         password,
-      }
+      },
+      createAuthenticationHeaders()
     );
     return data;
   } catch (err) {
