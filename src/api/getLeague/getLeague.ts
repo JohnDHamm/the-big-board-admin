@@ -1,10 +1,12 @@
 import axios from 'axios';
 import { DEV_API_ROOT_URL } from '../index';
+import { createAuthenticationHeaders } from '../helpers';
 
 export const getLeague = async (leagueId: string) => {
   try {
     const { data } = await axios.get(
-      `${DEV_API_ROOT_URL}/api/league/${leagueId}`
+      `${DEV_API_ROOT_URL}/api/league/${leagueId}`,
+      createAuthenticationHeaders()
     );
     return data;
   } catch (err) {
