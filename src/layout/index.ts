@@ -27,7 +27,8 @@ const RadioBlock = styled.div`
   margin: 0 1rem;
 `;
 
-const DeleteBtn = styled.div`
+const ActionBtn = styled.div`
+  margin-left: 0.5rem;
   &:hover {
     cursor: pointer;
   }
@@ -48,7 +49,7 @@ const SelectBlock = styled.div`
 export {
   Content,
   ContentItem,
-  DeleteBtn,
+  ActionBtn,
   PageLayout,
   RadioBlock,
   RowContent,

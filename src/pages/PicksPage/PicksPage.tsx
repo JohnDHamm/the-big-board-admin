@@ -1,6 +1,6 @@
 import React from 'react';
 import { OwnerName, PickBlock, PickNum, PickPlayer } from './PicksPage.styles';
-import { Content, ContentItem, DeleteBtn, PageLayout } from '../../layout';
+import { Content, ContentItem, ActionBtn, PageLayout } from '../../layout';
 import {
   deleteAllPicks,
   deletePick,
@@ -74,10 +74,8 @@ const reducer = (
 
 const PicksPage: React.FC = () => {
   const [leagues, setLeagues] = React.useState<LeagueListItem[]>([]);
-  const [
-    selectedLeague,
-    setSelectedLeague,
-  ] = React.useState<LeagueListItem | null>(null);
+  const [selectedLeague, setSelectedLeague] =
+    React.useState<LeagueListItem | null>(null);
   const [players, setPlayers] = React.useState<SavedPlayer[]>([]);
   const [teams, setTeams] = React.useState<Team[]>([]);
   const [owners, setOwners] = React.useState<Owner[]>([]);
@@ -107,13 +105,8 @@ const PicksPage: React.FC = () => {
       if (picksTotal > 0) {
         for (let i = 1; i < picksTotal + 1; i++) {
           if (picks[i]) {
-            const {
-              ownerName,
-              playerName,
-              teamAbbv,
-              playerPosition,
-              _id,
-            } = picks[i];
+            const { ownerName, playerName, teamAbbv, playerPosition, _id } =
+              picks[i];
             list.push(
               <PickBlock key={_id}>
                 <PickNum>{i}</PickNum>
@@ -126,7 +119,7 @@ const PicksPage: React.FC = () => {
                     <span>{' | '}</span>
                     <span>{teamAbbv}</span>
                   </div>
-                  <DeleteBtn onClick={() => deletePick(i)}>X</DeleteBtn>
+                  <ActionBtn onClick={() => deletePick(i)}>X</ActionBtn>
                 </PickPlayer>
               </PickBlock>
             );
