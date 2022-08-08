@@ -38,3 +38,7 @@ export const RankPlayer = styled.div`
   justify-content: space-between;
   align-items: center;
 `;
+
+export const ActionBtnContainer = styled.div`
+  display: flex;
+`;

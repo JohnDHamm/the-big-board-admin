@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Content,
   ContentItem,
-  DeleteBtn,
+  ActionBtn,
   PageLayout,
   RadioBlock,
   RowContent,
@@ -103,9 +103,8 @@ const LeaguesPage: React.FC = () => {
     {}
   );
   // const [ownerSelectionList, setOwnerSelectionList] = React.useState<Owner[]>([]);
-  const [draftStatus, setDraftStatus] = React.useState<DraftStatus>(
-    'not started'
-  );
+  const [draftStatus, setDraftStatus] =
+    React.useState<DraftStatus>('not started');
   const [positionSlots, posSlotsDispatch] = React.useReducer(
     slotsReducer,
     INITIAL_POSITION_SLOTS
@@ -126,13 +125,8 @@ const LeaguesPage: React.FC = () => {
       getLeague(value._id)
         .then((league: League) => {
           // console.log('league', league);
-          const {
-            scoringType,
-            draftOrder,
-            draftStatus,
-            name,
-            positionSlots,
-          } = league;
+          const { scoringType, draftOrder, draftStatus, name, positionSlots } =
+            league;
           setSelectedLeague(league);
           setName(name);
           setScoringType(scoringType);
@@ -294,7 +288,7 @@ const LeaguesPage: React.FC = () => {
             {draftOrder[i] ? (
               <OwnerName>
                 {getOwnerName(draftOrder[i])}
-                <DeleteBtn onClick={() => deleteOwner(i)}>X</DeleteBtn>
+                <ActionBtn onClick={() => deleteOwner(i)}>X</ActionBtn>
               </OwnerName>
             ) : (
               <SelectBlock onClick={() => handleSelect(i)}>

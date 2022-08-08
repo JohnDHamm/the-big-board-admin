@@ -10,12 +10,13 @@ import {
   RankNum,
   RankPlayer,
   TopContentItem,
+  ActionBtnContainer,
 } from '../RankingsPage.styles';
 import { ScoringTypeBlock } from './PositionRankingsPage.styles';
 import {
   Content,
   ContentItem,
-  DeleteBtn,
+  ActionBtn,
   RadioBlock,
   SelectBlock,
 } from '../../../layout';
@@ -24,23 +25,7 @@ import { NFL_POSITIONS } from '../../../constants';
 import { Radio } from '@material-ui/core';
 import isEmpty from 'lodash.isempty';
 import sortBy from 'lodash.sortby';
-
-declare global {
-  interface SavedRanking {
-    _id: string;
-    position: NFL_Position;
-    scoringType: ScoringType;
-    rank: number;
-    playerId: string;
-  }
-}
-
-interface SelectedRankingInfo {
-  name: string;
-  teamAbbv: string;
-}
-
-type SelectedRanking = SavedRanking & SelectedRankingInfo;
+import { swapRankings } from '../../../utils/shiftRanking';
 
 type RankingList = {
   [key in NFL_Position]: {
@@ -89,9 +74,8 @@ const PositionRankingsPage: React.FC = () => {
   >([]);
   const [teams, setTeams] = React.useState<Team[]>([]);
   const [scoringType, setScoringType] = React.useState<ScoringType>('non-ppr');
-  const [selectedPosition, setSelectedPosition] = React.useState<NFL_Position>(
-    'QB'
-  );
+  const [selectedPosition, setSelectedPosition] =
+    React.useState<NFL_Position>('QB');
   const [rankingsList, dispatch] = React.useReducer(reducer, initialRankings);
   const [showModal, setShowModal] = React.useState<boolean>(false);
   const [rankNumber, setRankNumber] = React.useState<number>(0);
@@ -152,15 +136,35 @@ const PositionRankingsPage: React.FC = () => {
     }
   };
 
+  const shiftRank = (rankNum: number, direction: ShiftDirection) => {
+    const secondRankNumber = direction === 'down' ? rankNum + 1 : rankNum - 1;
+    const firstRanking: SelectedRanking =
+      rankingsList[selectedPosition][rankNum];
+    const secondRanking: SelectedRanking =
+      rankingsList[selectedPosition][secondRankNumber];
+    const newRankings = swapRankings({
+      first: firstRanking,
+      second: secondRanking,
+    });
+    newRankings.forEach((newRank) => {
+      dispatch({
+        type: 'update',
+        payload: {
+          position: selectedPosition,
+          data: newRank,
+        },
+      });
+    });
+  };
+
   const renderRankings = (): JSX.Element[] => {
     let list: JSX.Element[] = [];
     if (rankingsList && !isEmpty(players) && !isEmpty(teams)) {
       const posRankTotal = Object.keys(rankingsList[selectedPosition]).length;
       if (posRankTotal > 0) {
         for (let i = 1; i < posRankTotal + 1; i++) {
-          const { name, teamAbbv, position, _id, playerId } = rankingsList[
-            selectedPosition
-          ][i];
+          const { name, teamAbbv, position, _id, playerId } =
+            rankingsList[selectedPosition][i];
           list.push(
             <RankBlock key={_id}>
               <RankNum>{i}</RankNum>
@@ -173,7 +177,19 @@ const PositionRankingsPage: React.FC = () => {
                     <span>{' | '}</span>
                     <span>{teamAbbv}</span>
                   </div>
-                  <DeleteBtn onClick={() => deleteRank(i)}>X</DeleteBtn>
+                  <ActionBtnContainer>
+                    {i !== posRankTotal && (
+                      <ActionBtn onClick={() => shiftRank(i, 'down')}>
+                        &#x2B07;
+                      </ActionBtn>
+                    )}
+                    {i > 1 && (
+                      <ActionBtn onClick={() => shiftRank(i, 'up')}>
+                        &#x2B06;
+                      </ActionBtn>
+                    )}
+                    <ActionBtn onClick={() => deleteRank(i)}>X</ActionBtn>
+                  </ActionBtnContainer>
                 </RankPlayer>
               ) : (
                 <SelectBlock onClick={() => handleSelect(i)}>

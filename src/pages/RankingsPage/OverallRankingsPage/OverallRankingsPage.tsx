@@ -8,11 +8,12 @@ import {
 import {
   Content,
   ContentItem,
-  DeleteBtn,
+  ActionBtn,
   RadioBlock,
   SelectBlock,
 } from '../../../layout';
 import {
+  ActionBtnContainer,
   RankBlock,
   RankNum,
   RankPlayer,
@@ -23,23 +24,7 @@ import { RankPlayerSelectModal } from '../../../components';
 import { Radio } from '@material-ui/core';
 import isEmpty from 'lodash.isempty';
 import sortBy from 'lodash.sortby';
-
-declare global {
-  interface SavedOverallRanking {
-    _id: string;
-    scoringType: ScoringType;
-    rank: number;
-    playerId: string;
-  }
-}
-
-interface SelectedRankingInfo {
-  name: string;
-  position: string;
-  teamAbbv: string;
-}
-
-type SelectedRanking = SavedOverallRanking & SelectedRankingInfo;
+import { swapRankings } from '../../../utils/shiftRanking';
 
 type OverallRankingList = {
   [key: number]: SelectedRanking;
@@ -92,7 +77,7 @@ const OverallRankingsPage: React.FC = () => {
       scoringType,
       playerId: '',
       name: '',
-      position: '',
+      position: 'QB', //position doesn't matter
       teamAbbv: '',
     };
     dispatch({
@@ -126,6 +111,22 @@ const OverallRankingsPage: React.FC = () => {
     }
   };
 
+  const shiftRank = (rankNum: number, direction: ShiftDirection) => {
+    const secondRankNumber = direction === 'down' ? rankNum + 1 : rankNum - 1;
+    const firstRanking: SelectedRanking = rankingsList[rankNum];
+    const secondRanking: SelectedRanking = rankingsList[secondRankNumber];
+    const newRankings = swapRankings({
+      first: firstRanking,
+      second: secondRanking,
+    });
+    newRankings.forEach((newRank) => {
+      dispatch({
+        type: 'update',
+        payload: newRank,
+      });
+    });
+  };
+
   const renderRankings = (): JSX.Element[] => {
     let list: JSX.Element[] = [];
     if (rankingsList && !isEmpty(players) && !isEmpty(teams)) {
@@ -145,7 +146,19 @@ const OverallRankingsPage: React.FC = () => {
                     <span>{' | '}</span>
                     <span>{teamAbbv}</span>
                   </div>
-                  <DeleteBtn onClick={() => deleteRank(i)}>X</DeleteBtn>
+                  <ActionBtnContainer>
+                    {i !== rankTotal && (
+                      <ActionBtn onClick={() => shiftRank(i, 'down')}>
+                        &#x2B07;
+                      </ActionBtn>
+                    )}
+                    {i > 1 && (
+                      <ActionBtn onClick={() => shiftRank(i, 'up')}>
+                        &#x2B06;
+                      </ActionBtn>
+                    )}
+                    <ActionBtn onClick={() => deleteRank(i)}>X</ActionBtn>
+                  </ActionBtnContainer>
                 </RankPlayer>
               ) : (
                 <SelectBlock onClick={() => handleSelect(i)}>
@@ -168,7 +181,7 @@ const OverallRankingsPage: React.FC = () => {
           const sortedRankings = sortBy(rankings, ['rank']);
           sortedRankings.forEach((ranking) => {
             let name = '',
-              position = '',
+              position: NFL_Position = 'QB',
               teamAbbv = '';
             if (rankings.length > 0) {
               const player = players.find(
