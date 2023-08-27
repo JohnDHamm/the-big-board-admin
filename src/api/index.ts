@@ -20,6 +20,7 @@ import { updateOverallRanking } from './updateOverallRanking/updateOverallRankin
 import { updateOwner } from './updateOwner/updateOwner';
 import { updatePlayer } from './updatePlayer/updatePlayer';
 import { updatePositionRanking } from './updatePositionRanking/updatePositionRanking';
+import { updateTeam } from './updateTeam/updateTeam';
 
 export const DEV_API_ROOT_URL =
   `${process.env.REACT_APP_API_URL}` || 'http://localhost:4001';
@@ -47,4 +48,5 @@ export {
   updateOwner,
   updatePlayer,
   updatePositionRanking,
+  updateTeam,
 };

@@ -11,3 +11,5 @@ interface NFL_Team {
 }
 
 type Team = NFL_Team;
+
+type TeamUpdate = Omit<NFL_Team, 'colors' | 'abbv'>;
