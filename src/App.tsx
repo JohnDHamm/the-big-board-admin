@@ -42,6 +42,10 @@ const ProtectedRoutes: React.FC = () => {
 
 function App() {
   const user = useUser();
+  // document.addEventListener('visibilitychange', () => {
+  //   console.log('document.visibilityState', document.visibilityState);
+  //   // console.log('user', user);
+  // });
 
   return (
     <UserContext.Provider value={user}>
